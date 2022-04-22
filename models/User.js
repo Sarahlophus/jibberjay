@@ -4,7 +4,7 @@ const userSchema = new Schema(
   {
     username: {
       type: String,
-      required: true,
+      required: [true, "you need a username!"],
       unique: true,
       trim: true,
     },
@@ -35,7 +35,12 @@ const userSchema = new Schema(
   }
 );
 
-// TODO: Add friend count virtual method that retrieves the length of the user's friends array field on query
+// create virtual property 'friendCount' that retrieves length of user's friends array
+userSchema.virtual("friendCount").get(function () {
+  return this.friends.length;
+});
+
+// initialize User model
 const User = model("user", userSchema);
 
 module.exports = User;
