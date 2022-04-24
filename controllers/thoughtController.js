@@ -17,26 +17,31 @@ module.exports = {
 
   // create a new thought and push its _id to the user's thoughts array field
   createThought(req, res) {
+    console.log("What a great thought! 🤔");
     Thought.create(req.body)
       .then((thought) => {
-        return User.findOneAndUpdate({ _id: req.params.userID }, { $addToSet: { thoughts: thought._id } }, { new: true });
+        return User.findOneAndUpdate({ _id: req.body.userId }, { $push: { thoughts: thought._id } }, { new: true });
       })
-      .then((user) =>
-        !user
-          ? res.status(404).json({
-              message: "Thought created, but found no user with that name",
-            })
-          : res.json("What a great thought! 🤔")
-      )
+      .then((user) => res.json(user))
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
 
-  //   update thought
+  // update thought
+  updateThought(req, res) {
+    Thought.findOneAndUpdate({ _id: req.params.thoughtId }, { $set: req.body }, { runValidators: true, new: true })
+      .then((course) => (!course ? res.status(404).json({ message: "There is no Thought with this ID!" }) : res.json(course)))
+      .catch((err) => res.status(500).json(err));
+  },
 
   // delete thought
+  deleteThought(req, res) {
+    Thought.findOneAndDelete({ _id: req.params.thoughtId })
+      .then((thought) => res.json({ message: "Your Thought has been deleted!" }))
+      .catch((err) => res.status(500).json(err));
+  },
 
   // add reaction that takes in thoughtId and reaction
 

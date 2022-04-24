@@ -64,12 +64,12 @@ module.exports = {
       .catch((err) => res.status(500).json(err));
   },
 
-  // remove friend from user -- FIX ME I'M BROKEN!!
+  // remove friend from user
   removeFriend(req, res) {
     console.log("You are removing a friend 👋");
     console.log(req.params.friendId);
-    User.findOneAndUpdate({ _id: req.params.UserId }, { $pull: { friends: { friendId: req.params.friendId } } }, { runValidators: true, new: true })
-      .then((user) => (!user ? res.status(404).json({ message: "No user found with that ID 🙁" }) : res.json(user)))
+    User.findOneAndUpdate({ _id: req.params.userId }, { $pull: { friends: req.params.friendId } }, { new: true })
+      .then((user) => (!user ? res.status(404).json({ message: "No user with that ID was found 🙁" }) : res.json(user)))
       .catch((err) => res.status(500).json(err));
   },
 };
