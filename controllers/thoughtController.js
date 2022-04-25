@@ -7,6 +7,7 @@ module.exports = {
       .then((thoughts) => res.json(thoughts))
       .catch((err) => res.status(500).json(err));
   },
+
   // Get a single thought
   getSingleThought(req, res) {
     Thought.findOne({ _id: req.params.thoughtId })
@@ -43,7 +44,15 @@ module.exports = {
       .catch((err) => res.status(500).json(err));
   },
 
-  // add reaction that takes in thoughtId and reaction
-
-  // find one and update a thought with that id
+  // add reaction that takes in thoughtId
+  createReaction(req, res) {
+    console.log("You tell 'em! 😎");
+    Thought.findOneAndUpdate({ _id: req.params.thoughtId }, { $addToSet: { reactions: req.body } }, { runValidators: true, new: true })
+      .then((thought) => (!thought ? res.status(404).json({ message: "You can't react to that Thought because it doesn't exist 🤦" }) : res.json(thought)))
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  },
+  // delete reaction
 };
