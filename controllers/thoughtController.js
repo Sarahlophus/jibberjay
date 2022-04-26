@@ -54,5 +54,15 @@ module.exports = {
         res.status(500).json(err);
       });
   },
-  // delete reaction
+  // delete reaction from thought
+  deleteReaction(req, res) {
+    console.log("You are removing your Reaction from this Thought 🤐");
+    console.log(req.params.reactionId);
+    Thought.findOneAndRemove({ _id: req.params.thoughtId }, { $pull: { reactions: { reactionId: req.params.reactionId } } }, { runValidators: true, new: true })
+      .then((thought) => (!thought ? res.status(404).json({ message: "No thought with that ID was found 🙁" }) : res.json(thought)))
+      .catch((err) => {
+        console.log(err);
+        res.status(500).json(err);
+      });
+  },
 };
