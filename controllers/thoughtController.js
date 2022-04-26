@@ -33,7 +33,7 @@ module.exports = {
   // update thought
   updateThought(req, res) {
     Thought.findOneAndUpdate({ _id: req.params.thoughtId }, { $set: req.body }, { runValidators: true, new: true })
-      .then((course) => (!course ? res.status(404).json({ message: "There is no Thought with this ID!" }) : res.json(course)))
+      .then((thought) => (!thought ? res.status(404).json({ message: "There is no Thought with this ID!" }) : res.json(thought)))
       .catch((err) => res.status(500).json(err));
   },
 
@@ -58,8 +58,16 @@ module.exports = {
   deleteReaction(req, res) {
     console.log("You are removing your Reaction from this Thought 🤐");
     console.log(req.params.reactionId);
-    Thought.findOneAndRemove({ _id: req.params.thoughtId }, { $pull: { reactions: { reactionId: req.params.reactionId } } }, { runValidators: true, new: true })
-      .then((thought) => (!thought ? res.status(404).json({ message: "No thought with that ID was found 🙁" }) : res.json(thought)))
+    Thought.findByIdAndUpdate(req.params.thoughtId, { $pull: { reactions: { reactionId: req.params.reactionId } } })
+      .then((thought) => {
+        if (!thought) return res.status(404).json({ message: "No thought with that ID was found 🙁" });
+        else {
+          Thought.findOne({ _id: req.params.thoughtId })
+            .select("-__v")
+            .then((thought) => (!thought ? res.status(404).json({ message: "No thought with that ID exists!" }) : res.json(thought)))
+            .catch((err) => res.status(500).json(err));
+        }
+      })
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
